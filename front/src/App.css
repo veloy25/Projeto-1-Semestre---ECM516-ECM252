@@ -1,0 +1,155 @@
+.page {
+  min-height: 100vh;
+  background-color: #f4f1e8;
+  font-family: Arial, sans-serif;
+}
+
+.header-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 40px;
+  padding-bottom: 25px;
+}
+
+.logo {
+  margin: 0;
+  font-size: 42px;
+  font-weight: bold;
+  color: #4b3b2a;
+  text-align: center;
+}
+
+.subtitle {
+  margin-top: 8px;
+  margin-bottom: 25px;
+  font-size: 18px;
+  color: #7a6855;
+  text-align: center;
+}
+
+.nav-wrapper {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.nav {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  background-color: #ffffff;
+  border: 1px solid #cfc7b8;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.nav-button {
+  padding: 14px 28px;
+  border: none;
+  border-right: 1px solid #cfc7b8;
+  background-color: #ffffff;
+  color: #3f352b;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.nav-button-active {
+  background-color: #b7b095;
+  color: #ffffff;
+}
+
+.main {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 30px 20px 50px;
+}
+
+.home-section {
+  background-color: #ffffff;
+  border: 1px solid #d8d1c3;
+  padding: 30px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.home-title {
+  margin-top: 0;
+  font-size: 30px;
+  color: #3f352b;
+}
+
+.home-text {
+  font-size: 17px;
+  color: #5f564c;
+  line-height: 1.6;
+  margin-bottom: 0;
+}
+
+.depoimentos-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.title {
+  margin: 0;
+  font-size: 30px;
+  color: #3f352b;
+}
+
+.add-button {
+  background-color: #7d8f69;
+  color: #ffffff;
+  border: none;
+  padding: 12px 18px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.card {
+  background-color: #ffffff;
+  border: 1px solid #d8d1c3;
+  padding: 25px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.card-title {
+  margin-top: 0;
+  margin-bottom: 20px;
+  font-size: 24px;
+  color: #3f352b;
+}
+
+.info-group {
+  margin-bottom: 20px;
+}
+
+.text {
+  font-size: 16px;
+  color: #4f463d;
+  margin: 8px 0;
+}
+
+.comment-box {
+  background-color: #f7f4ed;
+  padding: 18px;
+  border: 1px solid #ddd5c7;
+}
+
+.comment-title {
+  margin: 0 0 10px 0;
+  font-weight: bold;
+  color: #3f352b;
+}
+
+.comment-text {
+  margin: 0;
+  font-size: 16px;
+  color: #5f564c;
+  line-height: 1.5;
+}
