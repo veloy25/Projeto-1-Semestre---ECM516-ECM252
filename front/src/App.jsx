@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "./App.css"; 
+import "./App.css";
 
 function App() {
   const [abaAtiva, setAbaAtiva] = useState("home");
@@ -15,20 +15,20 @@ function App() {
   };
 
   const handleLoginSubmit = () => {
-    setIsLogado(true); 
-    setAbaAtiva("painel"); 
+    setIsLogado(true);
+    setAbaAtiva("painel");
   };
 
   const handleLogout = () => {
     setIsLogado(false);
-    setAbaAtiva("home"); 
+    setAbaAtiva("home");
   };
 
   if (isLogado) {
     return (
       <div className="page">
         <header className="header-area">
-          <h1 className="logo">PetLove Center</h1>
+          <h1 className="logo">AUventura Park</h1>
           <p className="subtitle">Área do Cliente</p>
 
           <nav className="nav-wrapper">
@@ -41,7 +41,7 @@ function App() {
               </button>
               <button
                 className="login-button"
-                style={{ borderRight: "none", color: "#d9534f" }} 
+                style={{ borderRight: "none", color: "#d9534f" }}
                 onClick={handleLogout}
               >
                 Sair
@@ -55,7 +55,7 @@ function App() {
             <section className="card">
               <h2 className="card-title">Olá, Tutor!</h2>
               <p className="text">Aqui você poderá acompanhar a rotina do seu pet, verificar agendamentos e ver fotos das atividades diárias.</p>
-              
+
               <div className="comment-box" style={{ marginTop: "20px" }}>
                 <p className="comment-title">Status de hoje:</p>
                 <p className="comment-text">🐾 O Thor está brincando no pátio principal com a turma dos grandalhões!</p>
@@ -70,7 +70,7 @@ function App() {
   return (
     <div className="page">
       <header className="header-area">
-        <h1 className="logo">PetLove Center</h1>
+        <h1 className="logo">AUventura Park</h1>
         <p className="subtitle">Cuidado, carinho e diversão para o seu cão</p>
 
         <nav className="nav-wrapper">
@@ -83,20 +83,22 @@ function App() {
             </button>
 
             <button
+              className={`nav-button ${abaAtiva === "login" ? "nav-button-active" : ""}`}
+              onClick={() => {
+                setAbaAtiva("login");
+              }}
+            >
+              Entrar/Criar
+            </button>
+
+            <button
               className={`nav-button ${abaAtiva === "depoimentos" ? "nav-button-active" : ""}`}
               onClick={() => setAbaAtiva("depoimentos")}
             >
               Depoimentos
             </button>
-          
-            <button
-              className={`nav-button ${abaAtiva === "login" ? "nav-button-active" : ""}`}
-              onClick={() => {
-                setAbaAtiva("login"); 
-              }}
-            >
-              Entrar
-            </button>
+
+
           </div>
         </nav>
       </header>
@@ -104,12 +106,48 @@ function App() {
       <main className="main">
         {abaAtiva === "home" && (
           <section className="home-section">
-            <h2 className="home-title">Bem-vindo à PetLove Center</h2>
+            <h2 className="home-title">Bem-vindo à AUventura Park</h2>
             <p className="home-text">
               Nossa creche para cães foi pensada para oferecer segurança,
               socialização, conforto e bem-estar para os pets durante toda a
               permanência.
             </p>
+          </section>
+        )}
+
+        
+        {abaAtiva === "login" && (
+          <section className="card login">
+            <h2 className="card-title" style={{ textAlign: "center" }}>Acesse sua conta</h2>
+            <p className="text" style={{ textAlign: "center", marginBottom: "25px" }}>
+              Faça login para gerenciar as informações do seu pet.
+            </p>
+
+            <form onSubmit={handleLoginSubmit} className="login-form">
+              <div className="form-group">
+                <label htmlFor="email" className="form-label">E-mail:</label>
+                <input type="email" id="email" className="form-input" placeholder="seu@email.com" required />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="senha" className="form-label">Senha:</label>
+                <input type="password" id="senha" className="form-input" placeholder="••••••••" required />
+              </div>
+
+              <button type="submit" className="add-button" style={{ width: "100%", marginTop: "15px" }}>
+                Entrar
+              </button>
+
+              <button
+                type="button"
+                className="add-button"
+                style={{ width: "100%", marginTop: "15px" }}
+                onClick={() => setAbaAtiva("criarConta")}
+              >
+                Criar conta
+              </button>
+
+            </form>
           </section>
         )}
 
@@ -146,30 +184,7 @@ function App() {
           </section>
         )}
 
-        {abaAtiva === "login" && (
-          <section className="card login">
-            <h2 className="card-title" style={{ textAlign: "center" }}>Acesse sua conta</h2>
-            <p className="text" style={{ textAlign: "center", marginBottom: "25px" }}>
-              Faça login para gerenciar as informações do seu pet.
-            </p>
-            
-            <form onSubmit={handleLoginSubmit} className="login-form">
-              <div className="form-group">
-                <label htmlFor="email" className="form-label">E-mail</label>
-                <input type="email" id="email" className="form-input" placeholder="seu@email.com" required />
-              </div>
-              
-              <div className="form-group">
-                <label htmlFor="senha" className="form-label">Senha</label>
-                <input type="password" id="senha" className="form-input" placeholder="••••••••" required />
-              </div>
 
-              <button type="submit" className="add-button" style={{ width: "100%", marginTop: "15px" }}>
-                Entrar
-              </button>
-            </form>
-          </section>
-        )}
       </main>
     </div>
   );
