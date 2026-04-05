@@ -9,11 +9,13 @@ const DB_HOST = process.env.DB_HOST || "127.0.0.1";
 const DB_USER = process.env.DB_USER || "root";
 const DB_PASSWORD = process.env.DB_PASSWORD || "";
 const DB_NAME = process.env.DB_DATABASE || "auventura";
+const DB_PORT = process.env.DB_PORT || 3306;
 
 const rootPool = mysql.createPool({
   host: DB_HOST,
   user: DB_USER,
   password: DB_PASSWORD,
+  port: DB_PORT,
   waitForConnections: true,
   connectionLimit: 2,
   queueLimit: 0,
@@ -24,6 +26,7 @@ const pool = mysql.createPool({
   user: DB_USER,
   password: DB_PASSWORD,
   database: DB_NAME,
+  port: DB_PORT,
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
@@ -35,7 +38,9 @@ const ensureDatabase = async () => {
 };
 
 const initializeDatabase = async () => {
+  console.log("Initializing database...");
   await ensureDatabase();
+  console.log("Database ensured.");
   await pool.query(`CREATE TABLE IF NOT EXISTS depoimentos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nomeCachorro VARCHAR(100) NOT NULL,
@@ -56,15 +61,17 @@ app.get("/api/depoimentos", async (req, res) => {
     res.json(rows);
   } catch (error) {
     console.error("GET /api/depoimentos error:", error);
-    res.status(500).json({ error: "Não foi possível buscar depoimentos." });
+    res.status(500).json({ error: "Nï¿½o foi possï¿½vel buscar depoimentos." });
   }
 });
 
 app.post("/api/depoimentos", async (req, res) => {
+  console.log("POST /api/depoimentos received:", req.body);
   const { nomeCachorro, nomeTutor, raca, comentario } = req.body;
 
   if (!nomeCachorro || !nomeTutor || !raca || !comentario) {
-    return res.status(400).json({ error: "Todos os campos são obrigatórios." });
+    console.log("Missing fields");
+    return res.status(400).json({ error: "Todos os campos sï¿½o obrigatï¿½rios." });
   }
 
   try {
@@ -72,6 +79,7 @@ app.post("/api/depoimentos", async (req, res) => {
       "INSERT INTO depoimentos (nomeCachorro, nomeTutor, raca, comentario) VALUES (?, ?, ?, ?)",
       [nomeCachorro, nomeTutor, raca, comentario]
     );
+    console.log("Insert successful, ID:", result.insertId);
 
     res.status(201).json({
       id: result.insertId,
@@ -83,12 +91,12 @@ app.post("/api/depoimentos", async (req, res) => {
     });
   } catch (error) {
     console.error("POST /api/depoimentos error:", error);
-    res.status(500).json({ error: "Não foi possível salvar o depoimento." });
+    res.status(500).json({ error: "Nï¿½o foi possï¿½vel salvar o depoimento." });
   }
 });
 
 app.use((req, res) => {
-  res.status(404).json({ error: "Rota não encontrada." });
+  res.status(404).json({ error: "Rota nï¿½o encontrada." });
 });
 
 initializeDatabase()
