@@ -1,6 +1,5 @@
 # Backend environment files
 back/.env
-back/.env.example
 
 # Frontend ignore rules
 front/logs
