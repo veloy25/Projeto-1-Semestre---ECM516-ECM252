@@ -4,6 +4,13 @@ import "./App.css";
 function App() {
   const [abaAtiva, setAbaAtiva] = useState("home");
   const [isLogado, setIsLogado] = useState(false);
+  const [user, setUser] = useState(null);
+  const [authMode, setAuthMode] = useState("login");
+  const [authName, setAuthName] = useState("");
+  const [authEmail, setAuthEmail] = useState("");
+  const [authPassword, setAuthPassword] = useState("");
+  const [authError, setAuthError] = useState("");
+  const [authLoading, setAuthLoading] = useState(false);
   const [depoimentos, setDepoimentos] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [loadingDepoimentos, setLoadingDepoimentos] = useState(false);
@@ -15,6 +22,34 @@ function App() {
     raca: "",
     comentario: "",
   });
+
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      return;
+    }
+
+    const loadProfile = async () => {
+      try {
+        const response = await fetch("/api/me", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!response.ok) {
+          throw new Error("Token inválido");
+        }
+
+        const data = await response.json();
+        setUser(data.user);
+        setIsLogado(true);
+      } catch (error) {
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("authUser");
+        setIsLogado(false);
+      }
+    };
+
+    loadProfile();
+  }, []);
 
   const loadDepoimentos = async () => {
     setLoadingDepoimentos(true);
@@ -41,15 +76,69 @@ function App() {
     }
   }, [abaAtiva]);
 
-  const handleLoginSubmit = (event) => {
+  const handleAuthSubmit = async (event) => {
     event.preventDefault();
-    setIsLogado(true);
-    setAbaAtiva("painel");
+    setAuthError("");
+    setFeedbackMessage("");
+    setAuthLoading(true);
+
+    if (!authEmail || !authPassword || (authMode === "signup" && !authName)) {
+      setAuthError("Preencha todos os campos obrigatórios.");
+      setAuthLoading(false);
+      return;
+    }
+
+    try {
+      const endpoint = authMode === "login" ? "/api/login" : "/api/signup";
+      const payload = authMode === "login"
+        ? { email: authEmail, senha: authPassword }
+        : { nome: authName, email: authEmail, senha: authPassword };
+
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const responseBody = await response.json();
+      if (!response.ok) {
+        throw new Error(responseBody.error || "Falha na autenticação.");
+      }
+
+      if (authMode === "signup") {
+        setFeedbackMessage("Conta criada com sucesso. Faça login para continuar.");
+        setAuthMode("login");
+        setAuthName("");
+      } else {
+        localStorage.setItem("authToken", responseBody.token);
+        localStorage.setItem("authUser", JSON.stringify(responseBody.user));
+        setUser(responseBody.user);
+        setIsLogado(true);
+        setAbaAtiva("painel");
+      }
+
+      setAuthEmail("");
+      setAuthPassword("");
+    } catch (error) {
+      console.error(error);
+      setAuthError(error.message || "Erro ao autenticar. Tente novamente.");
+    } finally {
+      setAuthLoading(false);
+    }
   };
 
   const handleLogout = () => {
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("authUser");
+    setUser(null);
     setIsLogado(false);
     setAbaAtiva("home");
+    setAuthMode("login");
+    setAuthName("");
+    setAuthEmail("");
+    setAuthPassword("");
+    setAuthError("");
+    setFeedbackMessage("");
   };
 
   const handleDepoimentoChange = (event) => {
@@ -119,7 +208,8 @@ function App() {
         <main className="main">
           {abaAtiva === "painel" && (
             <section className="card">
-              <h2 className="card-title">Ola, Tutor!</h2>
+              <h2 className="card-title">Ola, {user?.nome || "Tutor"}!</h2>
+              <p className="text">Você está logado como <strong>{user?.email}</strong>.</p>
               <p className="text">
                 Aqui voce podera acompanhar a rotina do seu pet, verificar agendamentos e ver fotos das atividades diarias.
               </p>
@@ -152,7 +242,12 @@ function App() {
 
             <button
               className={`nav-button ${abaAtiva === "login" ? "nav-button-active" : ""}`}
-              onClick={() => setAbaAtiva("login")}
+              onClick={() => {
+                setAbaAtiva("login");
+                setAuthMode("login");
+                setAuthError("");
+                setFeedbackMessage("");
+              }}
             >
               Entrar/Criar
             </button>
@@ -179,35 +274,77 @@ function App() {
 
         {abaAtiva === "login" && (
           <section className="card login">
-            <h2 className="card-title" style={{ textAlign: "center" }}>Acesse sua conta</h2>
+            <h2 className="card-title" style={{ textAlign: "center" }}>
+              {authMode === "login" ? "Acesse sua conta" : "Crie sua conta"}
+            </h2>
             <p className="text" style={{ textAlign: "center", marginBottom: "25px" }}>
-              Faça login para gerenciar as informacoes do seu pet.
+              {authMode === "login"
+                ? "Faça login para gerenciar as informacoes do seu pet."
+                : "Cadastre-se para acessar o painel do tutor."}
             </p>
 
-            <form onSubmit={handleLoginSubmit} className="login-form">
+            <form onSubmit={handleAuthSubmit} className="login-form">
+              {authMode === "signup" && (
+                <div className="form-group">
+                  <label htmlFor="nome" className="form-label">Nome:</label>
+                  <input
+                    id="nome"
+                    type="text"
+                    className="form-input"
+                    value={authName}
+                    onChange={(event) => setAuthName(event.target.value)}
+                    placeholder="Seu nome"
+                    required
+                  />
+                </div>
+              )}
+
               <div className="form-group">
                 <label htmlFor="email" className="form-label">E-mail:</label>
-                <input type="email" id="email" className="form-input" placeholder="seu@email.com" required />
+                <input
+                  id="email"
+                  type="email"
+                  className="form-input"
+                  value={authEmail}
+                  onChange={(event) => setAuthEmail(event.target.value)}
+                  placeholder="seu@email.com"
+                  required
+                />
               </div>
 
               <div className="form-group">
                 <label htmlFor="senha" className="form-label">Senha:</label>
-                <input type="password" id="senha" className="form-input" placeholder="senha" required />
+                <input
+                  type="password"
+                  id="senha"
+                  className="form-input"
+                  value={authPassword}
+                  onChange={(event) => setAuthPassword(event.target.value)}
+                  placeholder="senha"
+                  required
+                />
               </div>
 
-              <button type="submit" className="add-button" style={{ width: "100%", marginTop: "15px" }}>
-                Entrar
-              </button>
+              {authError && <p className="text" style={{ color: "#d9534f" }}>{authError}</p>}
+              {feedbackMessage && <p className="text" style={{ color: "#28a745" }}>{feedbackMessage}</p>}
 
-              <button
-                type="button"
-                className="add-button"
-                style={{ width: "100%", marginTop: "15px" }}
-                onClick={() => setAbaAtiva("criarConta")}
-              >
-                Criar conta
+              <button type="submit" className="add-button" style={{ width: "100%", marginTop: "15px" }}>
+                {authMode === "login" ? "Entrar" : "Criar conta"}
               </button>
             </form>
+
+            <button
+              type="button"
+              className="add-button"
+              style={{ width: "100%", marginTop: "15px", backgroundColor: "#007bff" }}
+              onClick={() => {
+                setAuthMode(authMode === "login" ? "signup" : "login");
+                setAuthError("");
+                setFeedbackMessage("");
+              }}
+            >
+              {authMode === "login" ? "Ainda nao tenho conta" : "Ja tenho conta"}
+            </button>
           </section>
         )}
 
