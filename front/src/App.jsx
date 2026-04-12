@@ -1,20 +1,48 @@
-import { useState } from "react";
+﻿import { useEffect, useState } from "react";
 import "./App.css";
 
 function App() {
   const [abaAtiva, setAbaAtiva] = useState("home");
   const [isLogado, setIsLogado] = useState(false);
+  const [depoimentos, setDepoimentos] = useState([]);
+  const [showForm, setShowForm] = useState(false);
+  const [loadingDepoimentos, setLoadingDepoimentos] = useState(false);
+  const [formError, setFormError] = useState("");
+  const [feedbackMessage, setFeedbackMessage] = useState("");
+  const [newDepoimento, setNewDepoimento] = useState({
+    nomeCachorro: "",
+    nomeTutor: "",
+    raca: "",
+    comentario: "",
+  });
 
-  const depoimentoTeste = {
-    nomeCachorro: "Thor",
-    nomeTutor: "Mariana Silva",
-    raca: "Golden Retriever",
-    data: "22/03/2026",
-    comentario:
-      "Thor adorou passar o dia na creche! Foi muito bem cuidado, brincou bastante e voltou para casa muito feliz.",
+  const loadDepoimentos = async () => {
+    setLoadingDepoimentos(true);
+    setFormError("");
+
+    try {
+      const response = await fetch("/api/depoimentos");
+      if (!response.ok) {
+        throw new Error("Falha ao buscar depoimentos");
+      }
+      const data = await response.json();
+      setDepoimentos(data);
+    } catch (error) {
+      console.error(error);
+      setFormError("Nao foi possivel carregar os depoimentos. Tente novamente mais tarde.");
+    } finally {
+      setLoadingDepoimentos(false);
+    }
   };
 
-  const handleLoginSubmit = () => {
+  useEffect(() => {
+    if (abaAtiva === "depoimentos") {
+      loadDepoimentos();
+    }
+  }, [abaAtiva]);
+
+  const handleLoginSubmit = (event) => {
+    event.preventDefault();
     setIsLogado(true);
     setAbaAtiva("painel");
   };
@@ -24,12 +52,50 @@ function App() {
     setAbaAtiva("home");
   };
 
+  const handleDepoimentoChange = (event) => {
+    const { name, value } = event.target;
+    setNewDepoimento((current) => ({ ...current, [name]: value }));
+  };
+
+  const handleDepoimentoSubmit = async (event) => {
+    event.preventDefault();
+    setFormError("");
+    setFeedbackMessage("");
+
+    const { nomeCachorro, nomeTutor, raca, comentario } = newDepoimento;
+    if (!nomeCachorro || !nomeTutor || !raca || !comentario) {
+      setFormError("Preencha todos os campos antes de enviar.");
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/depoimentos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newDepoimento),
+      });
+
+      if (!response.ok) {
+        const body = await response.json();
+        throw new Error(body.error || "Falha ao enviar depoimento.");
+      }
+
+      await loadDepoimentos();
+      setFeedbackMessage("Depoimento enviado com sucesso!");
+      setShowForm(false);
+      setNewDepoimento({ nomeCachorro: "", nomeTutor: "", raca: "", comentario: "" });
+    } catch (error) {
+      console.error(error);
+      setFormError("Nao foi possivel enviar o depoimento. Tente novamente.");
+    }
+  };
+
   if (isLogado) {
     return (
       <div className="page">
         <header className="header-area">
           <h1 className="logo">AUventura Park</h1>
-          <p className="subtitle">Área do Cliente</p>
+          <p className="subtitle">Area do Cliente</p>
 
           <nav className="nav-wrapper">
             <div className="nav">
@@ -53,12 +119,14 @@ function App() {
         <main className="main">
           {abaAtiva === "painel" && (
             <section className="card">
-              <h2 className="card-title">Olá, Tutor!</h2>
-              <p className="text">Aqui você poderá acompanhar a rotina do seu pet, verificar agendamentos e ver fotos das atividades diárias.</p>
+              <h2 className="card-title">Ola, Tutor!</h2>
+              <p className="text">
+                Aqui voce podera acompanhar a rotina do seu pet, verificar agendamentos e ver fotos das atividades diarias.
+              </p>
 
               <div className="comment-box" style={{ marginTop: "20px" }}>
                 <p className="comment-title">Status de hoje:</p>
-                <p className="comment-text">🐾 O Thor está brincando no pátio principal com a turma dos grandalhões!</p>
+                <p className="comment-text">O Thor esta brincando no patio principal com a turma dos grandalhoes!</p>
               </div>
             </section>
           )}
@@ -71,7 +139,7 @@ function App() {
     <div className="page">
       <header className="header-area">
         <h1 className="logo">AUventura Park</h1>
-        <p className="subtitle">Cuidado, carinho e diversão para o seu cão</p>
+        <p className="subtitle">Cuidado, carinho e diversao para o seu cao</p>
 
         <nav className="nav-wrapper">
           <div className="nav">
@@ -84,9 +152,7 @@ function App() {
 
             <button
               className={`nav-button ${abaAtiva === "login" ? "nav-button-active" : ""}`}
-              onClick={() => {
-                setAbaAtiva("login");
-              }}
+              onClick={() => setAbaAtiva("login")}
             >
               Entrar/Criar
             </button>
@@ -97,8 +163,6 @@ function App() {
             >
               Depoimentos
             </button>
-
-
           </div>
         </nav>
       </header>
@@ -106,21 +170,18 @@ function App() {
       <main className="main">
         {abaAtiva === "home" && (
           <section className="home-section">
-            <h2 className="home-title">Bem-vindo à AUventura Park</h2>
+            <h2 className="home-title">Bem-vindo a AUventura Park</h2>
             <p className="home-text">
-              Nossa creche para cães foi pensada para oferecer segurança,
-              socialização, conforto e bem-estar para os pets durante toda a
-              permanência.
+              Nossa creche para caes foi pensada para oferecer seguranca, socializacao, conforto e bem-estar durante toda a permanencia.
             </p>
           </section>
         )}
 
-        
         {abaAtiva === "login" && (
           <section className="card login">
             <h2 className="card-title" style={{ textAlign: "center" }}>Acesse sua conta</h2>
             <p className="text" style={{ textAlign: "center", marginBottom: "25px" }}>
-              Faça login para gerenciar as informações do seu pet.
+              Faça login para gerenciar as informacoes do seu pet.
             </p>
 
             <form onSubmit={handleLoginSubmit} className="login-form">
@@ -131,7 +192,7 @@ function App() {
 
               <div className="form-group">
                 <label htmlFor="senha" className="form-label">Senha:</label>
-                <input type="password" id="senha" className="form-input" placeholder="••••••••" required />
+                <input type="password" id="senha" className="form-input" placeholder="senha" required />
               </div>
 
               <button type="submit" className="add-button" style={{ width: "100%", marginTop: "15px" }}>
@@ -146,7 +207,6 @@ function App() {
               >
                 Criar conta
               </button>
-
             </form>
           </section>
         )}
@@ -155,36 +215,93 @@ function App() {
           <section>
             <div className="depoimentos-header">
               <h2 className="title">Depoimentos</h2>
-              <button className="add-button">Adicionar depoimento</button>
+              <button className="add-button" onClick={() => setShowForm((current) => !current)}>
+                {showForm ? "Fechar formulario" : "Adicionar depoimento"}
+              </button>
             </div>
 
-            <div className="card">
-              <h3 className="card-title">Depoimento teste</h3>
+            {showForm && (
+              <section className="card depoimento-form">
+                <h3 className="card-title">Novo Depoimento</h3>
+                {formError && <p className="text" style={{ color: "#d9534f" }}>{formError}</p>}
+                {feedbackMessage && <p className="text" style={{ color: "#28a745" }}>{feedbackMessage}</p>}
+                <form onSubmit={handleDepoimentoSubmit} className="login-form">
+                  <div className="form-group">
+                    <label htmlFor="nomeCachorro" className="form-label">Nome do cachorro:</label>
+                    <input
+                      id="nomeCachorro"
+                      name="nomeCachorro"
+                      className="form-input"
+                      value={newDepoimento.nomeCachorro}
+                      onChange={handleDepoimentoChange}
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="nomeTutor" className="form-label">Nome do tutor:</label>
+                    <input
+                      id="nomeTutor"
+                      name="nomeTutor"
+                      className="form-input"
+                      value={newDepoimento.nomeTutor}
+                      onChange={handleDepoimentoChange}
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="raca" className="form-label">Raca do cachorro:</label>
+                    <input
+                      id="raca"
+                      name="raca"
+                      className="form-input"
+                      value={newDepoimento.raca}
+                      onChange={handleDepoimentoChange}
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="comentario" className="form-label">Comentario:</label>
+                    <textarea
+                      id="comentario"
+                      name="comentario"
+                      className="form-input"
+                      value={newDepoimento.comentario}
+                      onChange={handleDepoimentoChange}
+                      rows={4}
+                      required
+                    />
+                  </div>
+                  <button type="submit" className="add-button" style={{ width: "100%", marginTop: "15px" }}>
+                    Enviar depoimento
+                  </button>
+                </form>
+              </section>
+            )}
 
-              <div className="info-group">
-                <p className="text">
-                  <strong>Nome do cachorro:</strong> {depoimentoTeste.nomeCachorro}
-                </p>
-                <p className="text">
-                  <strong>Nome do tutor:</strong> {depoimentoTeste.nomeTutor}
-                </p>
-                <p className="text">
-                  <strong>Raça do cachorro:</strong> {depoimentoTeste.raca}
-                </p>
-                <p className="text">
-                  <strong>Data:</strong> {depoimentoTeste.data}
-                </p>
-              </div>
+            <section className="depoimentos-list">
+              {loadingDepoimentos && <p className="text">Carregando depoimentos...</p>}
+              {formError && !showForm && <p className="text" style={{ color: "#d9534f" }}>{formError}</p>}
+              {!loadingDepoimentos && depoimentos.length === 0 && (
+                <p className="text">Ainda nao ha depoimentos cadastrados. Seja o primeiro a contribuir!</p>
+              )}
 
-              <div className="comment-box">
-                <p className="comment-title">Comentário:</p>
-                <p className="comment-text">{depoimentoTeste.comentario}</p>
-              </div>
-            </div>
+              {depoimentos.map((depoimento) => (
+                <div key={depoimento.id} className="card depoimento-card">
+                  <h3 className="card-title">{depoimento.nomeCachorro}</h3>
+                  <div className="info-group">
+                    <p className="text"><strong>Tutor:</strong> {depoimento.nomeTutor}</p>
+                    <p className="text"><strong>Raca:</strong> {depoimento.raca}</p>
+                    <p className="text"><strong>Enviado em:</strong> {new Date(depoimento.criado_em).toLocaleDateString()}</p>
+                  </div>
+                  <div className="comment-box">
+                    <p className="comment-title">Comentario:</p>
+                    <p className="comment-text">{depoimento.comentario}</p>
+                  </div>
+                </div>
+              ))}
+            </section>
           </section>
         )}
-
-
       </main>
     </div>
   );
