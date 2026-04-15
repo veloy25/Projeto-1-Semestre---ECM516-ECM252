@@ -1,0 +1,19 @@
+.home-section {
+    background-color: #ffffff;
+    border: 1px solid #d8d1c3;
+    padding: 30px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+  
+  .home-title {
+    margin-top: 0;
+    font-size: 30px;
+    color: #3f352b;
+  }
+  
+  .home-text {
+    font-size: 17px;
+    color: #5f564c;
+    line-height: 1.6;
+    margin-bottom: 0;
+  }

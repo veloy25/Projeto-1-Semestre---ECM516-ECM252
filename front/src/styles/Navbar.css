@@ -1,0 +1,36 @@
+.nav-wrapper {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
+  
+  .nav {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    background-color: #ffffff;
+    border: 1px solid #cfc7b8;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+  
+  .nav-button {
+    padding: 14px 28px;
+    border: none;
+    border-right: 1px solid #cfc7b8;
+    background-color: #ffffff;
+    color: #3f352b;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+  
+  .nav-button-active {
+    background-color: #b7b095;
+    color: #ffffff;
+  }
+  
+  .logout-button {
+    border-right: none;
+    color: #d9534f;
+  }
