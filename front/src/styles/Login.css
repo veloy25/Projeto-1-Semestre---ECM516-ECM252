@@ -1,0 +1,12 @@
+.login-title {
+    text-align: center;
+  }
+  
+  .login-text {
+    text-align: center;
+    margin-bottom: 25px;
+  }
+  
+  .switch-auth-button {
+    background-color: #007bff;
+  }

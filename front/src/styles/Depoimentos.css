@@ -1,0 +1,32 @@
+.depoimentos-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  
+  .depoimentos-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .depoimento-form {
+    margin-bottom: 25px;
+  }
+  
+  .depoimento-card {
+    margin-bottom: 20px;
+  }
+  
+  .textarea-group {
+    align-items: flex-start;
+  }
+  
+  .form-textarea {
+    min-height: 120px;
+    padding: 12px 14px;
+    resize: vertical;
+  }

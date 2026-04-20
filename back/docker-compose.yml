@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: auventura-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: auventura
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - microservices
+
+  api-gateway:
+    build:
+      context: ./services/api-gateway
+    container_name: api-gateway
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: 3000
+      USER_SERVICE_URL: http://user-service:3001
+      DEPOIMENTOS_SERVICE_URL: http://depoimentos-service:3002
+    depends_on:
+      - user-service
+      - depoimentos-service
+    networks:
+      - microservices
+
+  user-service:
+    build:
+      context: ./services/user-service
+    container_name: user-service
+    ports:
+      - "3001:3001"
+    environment:
+      USER_SERVICE_PORT: 3001
+      DB_HOST: mysql
+      DB_USER: root
+      DB_PASSWORD: root
+      DB_DATABASE: auventura
+      DB_PORT: 3306
+    depends_on:
+      - mysql
+    networks:
+      - microservices
+
+  depoimentos-service:
+    build:
+      context: ./services/depoimentos-service
+    container_name: depoimentos-service
+    ports:
+      - "3002:3002"
+    environment:
+      TESTIMONIALS_SERVICE_PORT: 3002
+      DB_HOST: mysql
+      DB_USER: root
+      DB_PASSWORD: root
+      DB_DATABASE: auventura
+      DB_PORT: 3306
+    depends_on:
+      - mysql
+    networks:
+      - microservices
+
+volumes:
+  mysql-data:
+
+networks:
+  microservices:
+    driver: bridge
