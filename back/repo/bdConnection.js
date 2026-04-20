@@ -1,23 +1,23 @@
 require("dotenv").config();
-const mysql = require("mysql2");
+import mysql from "mysql2";
+
 
 const repoParameters = {
     host: process.env.DB_HOST || "127.0.0.1",
     user: process.env.DB_USER || "root",
     password: process.env.DB_PASSWORD || "",
-    database: process.env.DB_DATABASE || "auventura",
+    database: null,
     dbPort: process.env.DB_PORT || 3306,
     port: PORT = process.env.PORT || 3000,
     jwtSecret: process.env.JWT_SECRET || "super_secret_login_key"
 }
 
 class bdConnection {
-    constructor() {
-        this.config = repoParameters
+    constructor(database) {
+        this.config = {...repoParameters, database: database}
         this.pool = null
-
     }
-
+    
     async init() {
 
         const rootPool = mysql.createPool({
@@ -41,6 +41,8 @@ class bdConnection {
         }).promise();
 
         console.log(`Banco de dados '${this.config.database}' inicializado e pronto para uso!`);
+
+        return this.pool
     }
 }
 
