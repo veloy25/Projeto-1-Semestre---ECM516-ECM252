@@ -1,4 +1,4 @@
-import bdConnection from "../repo/bdConnection";
+
 import mysql from "mysql2";
 import express from "express"
 
@@ -22,19 +22,30 @@ class user{
           console.log("Database table 'users' is ready.");
     }
 
-    async create(nome, email, senha) {
+    async createUser(nome, email, senha) {
         const normalizedEmail = email.trim().toLowerCase();
         
+        const [existingUsers] = await pool.query("SELECT id FROM users WHERE email = ?", [normalizedEmail]);
+        
+        if (existingUsers.length > 0) {
+            return {error: "Este e-mail já está em uso."}
+        }
+
+        if (!email || !senha || !nome){
+            return {error: "É necesário preencher todos os campos."}
+        }
+
         const [result] = await this.pool.query(
             "INSERT INTO usuarios (nome, email, password) VALUES (?, ?, ?)", 
             [nome.trim(), normalizedEmail, senha]
         );
-
+        
         return {
             id: result.insertId,
             nome: nome.trim(),
             email: normalizedEmail
         };
+        
     }
 
     async findByEmail(email) {
@@ -59,6 +70,4 @@ class user{
         
 }
 
-
-
-module.exports = user;
+export default user;
