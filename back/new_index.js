@@ -48,6 +48,6 @@ async function startApp() {
         process.exit(1); // Fecha o programa com erro
     }
 
+}
 
-
-startApp();
+startApp()
