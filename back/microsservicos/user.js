@@ -1,4 +1,3 @@
-
 import mysql from "mysql2";
 import express from "express"
 
