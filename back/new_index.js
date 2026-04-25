@@ -32,7 +32,7 @@ async function startApp() {
         userRoutes(userModel);
         reviewsRoutes(reviewsModel);
         
-        app.listen(5000, () => console.log("🚀 Servidor rodando na porta 5000"));
+        app.listen(3000, () => console.log("🚀 Servidor rodando na porta 5000"));
 
     } catch (error) {
         console.error("Falha na inicialização:", error);
@@ -118,18 +118,33 @@ function userRoutes(userModel) {
 
 function reviewsRoutes(reviewsModel){
     app.post("/api/depoimentos", async (req, res) => {
-        
-    });
+        try {
+            const {nomeCachorro, nomeTutor, raca, comentario} = req.body
+
+            const response = await reviewsModel.createReview(nomeCachorro, nomeTutor, raca, comentario)
+
+            if(!response[0]){
+                return res.status(401).json({error: response[1]})
+            }
+
+            res.status(200).json(response[1])
+
+        } catch (error) {
+            console.error("POST /api/depoimentos error:", error)
+
+            res.status(500).json({error: "Não foi possível publicar o depoimento."})
+        }   
+    })
 
     app.get("/api/depoimentos", async (req, res) =>{
         try {
             const response = await reviewsModel.getReview()
             res.status(200).json(response)
         } catch (error) {
-            console.error("GET /api/me error:", error);
-            res.status(500).json({ error: "Não foi possível encontrar o depoimento." });
+            console.error("GET /api/depoimentos error:", error)
+            res.status(500).json({ error: "Não foi possível encontrar o depoimento." })
         }
-    });
+    })
 }
 
 startApp()
