@@ -1,5 +1,6 @@
 import bdConnection from "./repo/bdConnection.js";
-import User from "./models/user.js";
+import User from "./microsservico/user.js";
+import Reviews from "./microsservicos/reviews.js"
 import express, { json } from "express";
 import nodemon from "nodemon";
 
@@ -14,15 +15,22 @@ async function startApp() {
     try {
         console.log("--- Sistema Iniciando ---");
 
-        const db = new bdConnection("meu_banco");
-        const pool = await db.init();
-
-        const userModel = new User(pool);
+        //criação do bd e tabela usuarios
+        const dbUser = new bdConnection("Usuarios");
+        const poolUser = await dbUser.init();
+        const userModel = new User(poolUser);
         await userModel.initializeTable();
+
+        //criação do bd e tabela usuarios
+        const dbReviews = new bdConnection("Depoimentos");
+        const poolReviews = await dbReviews.init();
+        const reviewsModel = new Reviews(poolReviews);
+        await reviewsModel.initializeTable();
 
         console.log("--- Sistema Pronto para Uso ---");
 
         userRoutes(userModel);
+        reviewsRoutes(reviewsModel);
         
         app.listen(3000, () => console.log("🚀 Servidor rodando na porta 3000"));
 
@@ -106,6 +114,9 @@ function userRoutes(userModel) {
             res.status(500).json({ error: "Não foi possível buscar o perfil." });
         }
     });
+}
+
+function reviewsRoutes(reviewsModel){
 }
 
 startApp()
