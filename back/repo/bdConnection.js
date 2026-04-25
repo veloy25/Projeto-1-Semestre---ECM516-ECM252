@@ -46,6 +46,6 @@ class bdConnection {
     }
 }
 
-module.exports = bdConnection;
+export default bdConnection
 
 
