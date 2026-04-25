@@ -32,7 +32,7 @@ async function startApp() {
         userRoutes(userModel);
         reviewsRoutes(reviewsModel);
         
-        app.listen(3000, () => console.log("🚀 Servidor rodando na porta 3000"));
+        app.listen(5000, () => console.log("🚀 Servidor rodando na porta 5000"));
 
     } catch (error) {
         console.error("Falha na inicialização:", error);
@@ -117,6 +117,19 @@ function userRoutes(userModel) {
 }
 
 function reviewsRoutes(reviewsModel){
+    app.post("/api/depoimentos", async (req, res) => {
+        
+    });
+
+    app.get("/api/depoimentos", async (req, res) =>{
+        try {
+            const response = await reviewsModel.getReview()
+            res.status(200).json(response)
+        } catch (error) {
+            console.error("GET /api/me error:", error);
+            res.status(500).json({ error: "Não foi possível encontrar o depoimento." });
+        }
+    });
 }
 
 startApp()
