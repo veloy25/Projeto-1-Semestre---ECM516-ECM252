@@ -25,14 +25,14 @@ class user{
     async createUser(nome, email, senha) {
         const normalizedEmail = email.trim().toLowerCase();
         
-        const [existingUsers] = await pool.query("SELECT id FROM users WHERE email = ?", [normalizedEmail]);
-        
-        if (existingUsers.length > 0) {
-            return {error: "Este e-mail já está em uso."}
+        if (!email || !senha || !nome){
+            return [null, {error: "É necesário preencher todos os campos."}]
         }
 
-        if (!email || !senha || !nome){
-            return {error: "É necesário preencher todos os campos."}
+        const [existingUsers] = await this.pool.query("SELECT id FROM users WHERE email = ?", [normalizedEmail]);
+        
+        if (existingUsers.length > 0) {
+            return [null, {error: "Este e-mail já está em uso."}]
         }
 
         const [result] = await this.pool.query(
@@ -40,30 +40,43 @@ class user{
             [nome.trim(), normalizedEmail, senha]
         );
         
-        return {
+        return [true, {
             id: result.insertId,
             nome: nome.trim(),
             email: normalizedEmail
-        };
+        }];
         
     }
 
-    async findByEmail(email) {
+    async findByEmail(email, senha) { 
+        if (!email || !senha || typeof email !== 'string') {
+            return [null, {error: "os dados não são válidos"}]; 
+        }
+
         const normalizedEmail = email.trim().toLowerCase();
 
+        if (!normalizedEmail.includes("@")) {
+            return [null, {error: "O email deve incluir @"}];
+        }
+
         const [rows] = await this.pool.query(
-            "SELECT id, nome, email, password FROM users WHERE email = ?", 
-            [normalizedEmail]
+            "SELECT id, nome, email, password FROM users WHERE email = ? AND password = ?", 
+            [normalizedEmail, senha]
         );
+
         return rows.length > 0 ? rows[0] : null;
     }
 
-    async findByIDl(id) {
+    async findById(id) {
 
         const [rows] = await this.pool.query(
             "SELECT nome, email, password FROM users WHERE id = ?", 
             [id]
         );
+
+        if (rows.length === 0){
+            return [null, {error: "Usuário não encontrado."}]
+        }
         return rows.length > 0 ? rows[0] : null;
     }
 
