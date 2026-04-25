@@ -32,7 +32,7 @@ async function startApp() {
         userRoutes(userModel);
         reviewsRoutes(reviewsModel);
         
-        app.listen(3000, () => console.log("🚀 Servidor rodando na porta 5000"));
+        app.listen(3000, () => console.log("🚀 Servidor rodando na porta 3000"));
 
     } catch (error) {
         console.error("Falha na inicialização:", error);
@@ -40,7 +40,6 @@ async function startApp() {
     }
 
 }
-
 
 function userRoutes(userModel) {
     
