@@ -25,13 +25,13 @@ class user{
         const normalizedEmail = email.trim().toLowerCase();
         
         if (!email || !senha || !nome){
-            return [null, {error: "É necesário preencher todos os campos."}]
+            return [false, {error: "É necesário preencher todos os campos."}]
         }
 
         const [existingUsers] = await this.pool.query("SELECT id FROM users WHERE email = ?", [normalizedEmail]);
         
         if (existingUsers.length > 0) {
-            return [null, {error: "Este e-mail já está em uso."}]
+            return [false, {error: "Este e-mail já está em uso."}]
         }
 
         const [result] = await this.pool.query(
