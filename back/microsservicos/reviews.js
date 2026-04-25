@@ -29,7 +29,7 @@ class reviews{
 
     async createReview(nomeCachorro, nomeTutor, raca, comentario){
         if (!nomeCachorro || !nomeTutor || !raca){
-            return [null, {error: "É necessário preencher todos os campos"}]
+            return [false, {error: "É necessário preencher todos os campos"}]
         }
 
         const [result] = await this.pool.query("INSERT INTO depoimentos (nomeCachorro, nomeTutor, raca, comentario) VALUES (?, ?, ?, ?)",
