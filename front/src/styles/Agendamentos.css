@@ -5,3 +5,12 @@
 .full-width-button {
   width: 100%;
 }
+
+.form-label {
+  width: 160px;
+  min-width: 160px;
+}
+
+.title {
+  margin-bottom: 20px;
+}

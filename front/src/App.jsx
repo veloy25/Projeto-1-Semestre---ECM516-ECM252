@@ -5,19 +5,19 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Depoimentos from "./pages/Depoimentos";
 import Agendamentos from "./pages/Agendamentos";
-
+ 
 function App() {
   const [abaAtiva, setAbaAtiva] = useState("home");
   const [isLogado, setIsLogado] = useState(false);
   const [user, setUser] = useState(null);
-
+ 
   const [authMode, setAuthMode] = useState("login");
   const [authName, setAuthName] = useState("");
   const [authEmail, setAuthEmail] = useState("");
   const [authPassword, setAuthPassword] = useState("");
   const [authError, setAuthError] = useState("");
   const [authLoading, setAuthLoading] = useState(false);
-
+ 
   const [depoimentos, setDepoimentos] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [loadingDepoimentos, setLoadingDepoimentos] = useState(false);
@@ -27,7 +27,7 @@ function App() {
   const [loadingAgendamentos, setLoadingAgendamentos] = useState(false);
   const [agendamentoError, setAgendamentoError] = useState("");
   const [agendamentoFeedback, setAgendamentoFeedback] = useState("");
-
+ 
   const [novoAgendamento, setNovoAgendamento] = useState({
     nomeCachorro: "",
     servico: "",
@@ -35,28 +35,28 @@ function App() {
     horario: "",
     observacoes: "",
 });
-
+ 
   const [newDepoimento, setNewDepoimento] = useState({
     nomeCachorro: "",
     nomeTutor: "",
     raca: "",
     comentario: "",
   });
-
+ 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
     if (!token) return;
-
+ 
     const loadProfile = async () => {
       try {
         const response = await fetch("/api/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
-
+ 
         if (!response.ok) {
           throw new Error("Token inválido");
         }
-
+ 
         const data = await response.json();
         setUser(data.user);
         setIsLogado(true);
@@ -66,21 +66,21 @@ function App() {
         setIsLogado(false);
       }
     };
-
+ 
     loadProfile();
   }, []);
-
+ 
   const loadDepoimentos = async () => {
     setLoadingDepoimentos(true);
     setFormError("");
-
+ 
     try {
       const response = await fetch("/api/depoimentos");
-
+ 
       if (!response.ok) {
         throw new Error("Falha ao buscar depoimentos");
       }
-
+ 
       const data = await response.json();
       setDepoimentos(data);
     } catch (error) {
@@ -90,45 +90,45 @@ function App() {
       setLoadingDepoimentos(false);
     }
   };
-
+ 
   useEffect(() => {
     if (abaAtiva === "depoimentos") {
       loadDepoimentos();
     }
   }, [abaAtiva]);
-
+ 
   const handleAuthSubmit = async (event) => {
     event.preventDefault();
     setAuthError("");
     setFeedbackMessage("");
     setAuthLoading(true);
-
+ 
     if (!authEmail || !authPassword || (authMode === "signup" && !authName)) {
       setAuthError("Preencha todos os campos obrigatórios.");
       setAuthLoading(false);
       return;
     }
-
+ 
     try {
       const endpoint = authMode === "login" ? "/api/login" : "/api/signup";
-
+ 
       const payload =
         authMode === "login"
           ? { email: authEmail, senha: authPassword }
           : { nome: authName, email: authEmail, senha: authPassword };
-
+ 
       const response = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-
+ 
       const responseBody = await response.json();
-
+ 
       if (!response.ok) {
         throw new Error(responseBody.error || "Falha na autenticação.");
       }
-
+ 
       if (authMode === "signup") {
         setFeedbackMessage("Conta criada com sucesso. Faça login para continuar.");
         setAuthMode("login");
@@ -140,7 +140,7 @@ function App() {
         setIsLogado(true);
         setAbaAtiva("painel");
       }
-
+ 
       setAuthEmail("");
       setAuthPassword("");
     } catch (error) {
@@ -150,7 +150,7 @@ function App() {
       setAuthLoading(false);
     }
   };
-
+ 
   const handleLogout = () => {
     localStorage.removeItem("authToken");
     localStorage.removeItem("authUser");
@@ -164,7 +164,7 @@ function App() {
     setAuthError("");
     setFeedbackMessage("");
   };
-
+ 
   const handleDepoimentoChange = (event) => {
     const { name, value } = event.target;
     setNewDepoimento((current) => ({
@@ -172,31 +172,31 @@ function App() {
       [name]: value,
     }));
   };
-
+ 
   const handleDepoimentoSubmit = async (event) => {
     event.preventDefault();
     setFormError("");
     setFeedbackMessage("");
-
+ 
     const { nomeCachorro, nomeTutor, raca, comentario } = newDepoimento;
-
+ 
     if (!nomeCachorro || !nomeTutor || !raca || !comentario) {
       setFormError("Preencha todos os campos antes de enviar.");
       return;
     }
-
+ 
     try {
       const response = await fetch("/api/depoimentos", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newDepoimento),
       });
-
+ 
       if (!response.ok) {
         const body = await response.json();
         throw new Error(body.error || "Falha ao enviar depoimento.");
       }
-
+ 
       await loadDepoimentos();
       setFeedbackMessage("Depoimento enviado com sucesso!");
       setShowForm(false);
@@ -211,30 +211,31 @@ function App() {
       setFormError("Nao foi possivel enviar o depoimento. Tente novamente.");
     }
   };
+ 
   const loadAgendamentos = async () => {
   setLoadingAgendamentos(true);
   setAgendamentoError("");
-
+ 
   const token = localStorage.getItem("authToken");
-
+ 
   if (!token) {
     setAgendamentoError("Você precisa fazer login para ver seus agendamentos.");
     setLoadingAgendamentos(false);
     return;
   }
-
+ 
   try {
     const response = await fetch("/api/agendamentos", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
-
+ 
     if (!response.ok) {
       const body = await response.json();
       throw new Error(body.error || "Falha ao buscar agendamentos.");
     }
-
+ 
     const data = await response.json();
     setAgendamentos(data);
   } catch (error) {
@@ -244,41 +245,41 @@ function App() {
     setLoadingAgendamentos(false);
   }
 };
-
+ 
 useEffect(() => {
   if (abaAtiva === "agendamentos" && isLogado) {
     loadAgendamentos();
   }
 }, [abaAtiva, isLogado]);
-
+ 
 const handleAgendamentoChange = (event) => {
   const { name, value } = event.target;
-
+ 
   setNovoAgendamento((current) => ({
     ...current,
     [name]: value,
   }));
 };
-
+ 
 const handleAgendamentoSubmit = async (event) => {
   event.preventDefault();
   setAgendamentoError("");
   setAgendamentoFeedback("");
-
+ 
   const { nomeCachorro, servico, data, horario } = novoAgendamento;
-
+ 
   if (!nomeCachorro || !servico || !data || !horario) {
     setAgendamentoError("Preencha todos os campos obrigatórios.");
     return;
   }
-
+ 
   const token = localStorage.getItem("authToken");
-
+ 
   if (!token) {
     setAgendamentoError("Você precisa fazer login para criar um agendamento.");
     return;
   }
-
+ 
   try {
     const response = await fetch("/api/agendamentos", {
       method: "POST",
@@ -288,14 +289,14 @@ const handleAgendamentoSubmit = async (event) => {
       },
       body: JSON.stringify(novoAgendamento),
     });
-
+ 
     if (!response.ok) {
       const body = await response.json();
       throw new Error(body.error || "Falha ao criar agendamento.");
     }
-
+ 
     await loadAgendamentos();
-
+ 
     setAgendamentoFeedback("Agendamento criado com sucesso!");
     setNovoAgendamento({
       nomeCachorro: "",
@@ -309,7 +310,7 @@ const handleAgendamentoSubmit = async (event) => {
     setAgendamentoError("Não foi possível criar o agendamento.");
   }
 };
-
+ 
   return (
     <div className="page">
       <Header
@@ -321,7 +322,7 @@ const handleAgendamentoSubmit = async (event) => {
         setAuthError={setAuthError}
         setFeedbackMessage={setFeedbackMessage}
       />
-
+ 
       <main className="main">
         {isLogado ? (
           <>
@@ -334,7 +335,7 @@ const handleAgendamentoSubmit = async (event) => {
                 <p className="text">
                   Aqui voce podera acompanhar a rotina do seu pet, verificar agendamentos e ver fotos das atividades diarias.
                 </p>
-
+ 
                 <div className="comment-box status-box">
                   <p className="comment-title">Status de hoje:</p>
                   <p className="comment-text">
@@ -343,7 +344,7 @@ const handleAgendamentoSubmit = async (event) => {
                 </div>
               </section>
             )}
-
+ 
             {abaAtiva === "agendamentos" && (
               <Agendamentos
                 isLogado={isLogado}
@@ -363,7 +364,7 @@ const handleAgendamentoSubmit = async (event) => {
         ) : (
           <>
             {abaAtiva === "home" && <Home />}
-
+ 
             {abaAtiva === "login" && (
               <Login
                 authMode={authMode}
@@ -382,7 +383,7 @@ const handleAgendamentoSubmit = async (event) => {
                 setFeedbackMessage={setFeedbackMessage}
               />
             )}
-
+ 
             {abaAtiva === "depoimentos" && (
               <Depoimentos
                 showForm={showForm}
@@ -396,11 +397,26 @@ const handleAgendamentoSubmit = async (event) => {
                 handleDepoimentoSubmit={handleDepoimentoSubmit}
               />
             )}
+ 
+            {abaAtiva === "agendamentos" && (
+              <Agendamentos
+                isLogado={isLogado}
+                setAbaAtiva={setAbaAtiva}
+                setAuthMode={setAuthMode}
+                agendamentos={[]}
+                novoAgendamento={novoAgendamento}
+                handleAgendamentoChange={handleAgendamentoChange}
+                handleAgendamentoSubmit={handleAgendamentoSubmit}
+                agendamentoError={agendamentoError}
+                agendamentoFeedback={agendamentoFeedback}
+                loadingAgendamentos={false}
+              />
+            )}
           </>
         )}
       </main>
     </div>
   );
 }
-
+ 
 export default App;

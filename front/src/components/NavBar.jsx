@@ -10,15 +10,7 @@ function Navbar({
   setFeedbackMessage,
 }) {
   const handleAgendamentosClick = () => {
-    if (isLogado) {
-      setAbaAtiva("agendamentos");
-      return;
-    }
-
-    setAbaAtiva("login");
-    setAuthMode("login");
-    setAuthError("");
-    setFeedbackMessage("");
+    setAbaAtiva("agendamentos");
   };
 
   if (isLogado) {
@@ -31,18 +23,15 @@ function Navbar({
           >
             Meu Pet
           </button>
-
           <button
             className={`nav-button ${abaAtiva === "agendamentos" ? "nav-button-active" : ""}`}
             onClick={handleAgendamentosClick}
           >
             Agendamentos
           </button>
-
-          <button className="login-button logout-button" onClick={handleLogout}>
+          <button className="nav-button logout-button" onClick={handleLogout}>
             Sair
           </button>
-
         </div>
       </nav>
     );
@@ -57,7 +46,6 @@ function Navbar({
         >
           Home
         </button>
-
         <button
           className={`nav-button ${abaAtiva === "login" ? "nav-button-active" : ""}`}
           onClick={() => {
@@ -69,14 +57,12 @@ function Navbar({
         >
           Entrar/Criar
         </button>
-
-        <button 
-          className = {`nav-button ${abaAtiva === "agendamentos" ? "nav-button-active" : ""}`}
+        <button
+          className={`nav-button ${abaAtiva === "agendamentos" ? "nav-button-active" : ""}`}
           onClick={handleAgendamentosClick}
         >
           Agendamentos
         </button>
-        
         <button
           className={`nav-button ${abaAtiva === "depoimentos" ? "nav-button-active" : ""}`}
           onClick={() => setAbaAtiva("depoimentos")}

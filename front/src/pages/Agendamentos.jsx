@@ -15,7 +15,7 @@ function Agendamentos({
 }) {
   if (!isLogado) {
     return (
-      <section className="card">
+      <section className="card" style={{ textAlign: "center" }}>
         <h2 className="card-title">Acesso restrito</h2>
         <p className="text">
           Para visualizar e criar agendamentos, você precisa fazer login.
@@ -86,6 +86,7 @@ function Agendamentos({
               className="form-input"
               value={novoAgendamento.data}
               onChange={handleAgendamentoChange}
+              min={new Date().toISOString().split("T")[0]}
               required
             />
           </div>
