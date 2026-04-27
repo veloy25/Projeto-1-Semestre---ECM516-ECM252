@@ -20,9 +20,17 @@ function Navbar({
             Meu Pet
           </button>
 
+          <button
+            className={`nav-button ${abaAtiva === "agendamentos" ? "nav-button-active" : ""}`}
+            onClick={() => setAbaAtiva("agendamentos")}
+          >
+            Agendamentos
+          </button>
+
           <button className="login-button logout-button" onClick={handleLogout}>
             Sair
           </button>
+
         </div>
       </nav>
     );

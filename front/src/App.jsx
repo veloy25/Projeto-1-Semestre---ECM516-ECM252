@@ -4,6 +4,7 @@ import Header from "./components/Header";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Depoimentos from "./pages/Depoimentos";
+import Agendamentos from "./pages/Agendamentos";
 
 function App() {
   const [abaAtiva, setAbaAtiva] = useState("home");
@@ -22,6 +23,18 @@ function App() {
   const [loadingDepoimentos, setLoadingDepoimentos] = useState(false);
   const [formError, setFormError] = useState("");
   const [feedbackMessage, setFeedbackMessage] = useState("");
+  const [agendamentos, setAgendamentos] = useState([]);
+  const [loadingAgendamentos, setLoadingAgendamentos] = useState(false);
+  const [agendamentoError, setAgendamentoError] = useState("");
+  const [agendamentoFeedback, setAgendamentoFeedback] = useState("");
+
+  const [novoAgendamento, setNovoAgendamento] = useState({
+    nomeCachorro: "",
+    servico: "",
+    data: "",
+    horario: "",
+    observacoes: "",
+});
 
   const [newDepoimento, setNewDepoimento] = useState({
     nomeCachorro: "",
@@ -198,6 +211,104 @@ function App() {
       setFormError("Nao foi possivel enviar o depoimento. Tente novamente.");
     }
   };
+  const loadAgendamentos = async () => {
+  setLoadingAgendamentos(true);
+  setAgendamentoError("");
+
+  const token = localStorage.getItem("authToken");
+
+  if (!token) {
+    setAgendamentoError("Você precisa fazer login para ver seus agendamentos.");
+    setLoadingAgendamentos(false);
+    return;
+  }
+
+  try {
+    const response = await fetch("/api/agendamentos", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const body = await response.json();
+      throw new Error(body.error || "Falha ao buscar agendamentos.");
+    }
+
+    const data = await response.json();
+    setAgendamentos(data);
+  } catch (error) {
+    console.error(error);
+    setAgendamentoError("Não foi possível carregar os agendamentos.");
+  } finally {
+    setLoadingAgendamentos(false);
+  }
+};
+
+useEffect(() => {
+  if (abaAtiva === "agendamentos" && isLogado) {
+    loadAgendamentos();
+  }
+}, [abaAtiva, isLogado]);
+
+const handleAgendamentoChange = (event) => {
+  const { name, value } = event.target;
+
+  setNovoAgendamento((current) => ({
+    ...current,
+    [name]: value,
+  }));
+};
+
+const handleAgendamentoSubmit = async (event) => {
+  event.preventDefault();
+  setAgendamentoError("");
+  setAgendamentoFeedback("");
+
+  const { nomeCachorro, servico, data, horario } = novoAgendamento;
+
+  if (!nomeCachorro || !servico || !data || !horario) {
+    setAgendamentoError("Preencha todos os campos obrigatórios.");
+    return;
+  }
+
+  const token = localStorage.getItem("authToken");
+
+  if (!token) {
+    setAgendamentoError("Você precisa fazer login para criar um agendamento.");
+    return;
+  }
+
+  try {
+    const response = await fetch("/api/agendamentos", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(novoAgendamento),
+    });
+
+    if (!response.ok) {
+      const body = await response.json();
+      throw new Error(body.error || "Falha ao criar agendamento.");
+    }
+
+    await loadAgendamentos();
+
+    setAgendamentoFeedback("Agendamento criado com sucesso!");
+    setNovoAgendamento({
+      nomeCachorro: "",
+      servico: "",
+      data: "",
+      horario: "",
+      observacoes: "",
+    });
+  } catch (error) {
+    console.error(error);
+    setAgendamentoError("Não foi possível criar o agendamento.");
+  }
+};
 
   return (
     <div className="page">
@@ -213,24 +324,42 @@ function App() {
 
       <main className="main">
         {isLogado ? (
-          abaAtiva === "painel" && (
-            <section className="card">
-              <h2 className="card-title">Ola, {user?.nome || "Tutor"}!</h2>
-              <p className="text">
-                Você está logado como <strong>{user?.email}</strong>.
-              </p>
-              <p className="text">
-                Aqui voce podera acompanhar a rotina do seu pet, verificar agendamentos e ver fotos das atividades diarias.
-              </p>
-
-              <div className="comment-box status-box">
-                <p className="comment-title">Status de hoje:</p>
-                <p className="comment-text">
-                  O Thor esta brincando no patio principal com a turma dos grandalhoes!
+          <>
+            {abaAtiva === "painel" && (
+              <section className="card">
+                <h2 className="card-title">Ola, {user?.nome || "Tutor"}!</h2>
+                <p className="text">
+                  Você está logado como <strong>{user?.email}</strong>.
                 </p>
-              </div>
-            </section>
-          )
+                <p className="text">
+                  Aqui voce podera acompanhar a rotina do seu pet, verificar agendamentos e ver fotos das atividades diarias.
+                </p>
+
+                <div className="comment-box status-box">
+                  <p className="comment-title">Status de hoje:</p>
+                  <p className="comment-text">
+                    O Thor esta brincando no patio principal com a turma dos grandalhoes!
+                  </p>
+                </div>
+              </section>
+            )}
+
+            {abaAtiva === "agendamentos" && (
+              <Agendamentos
+                isLogado={isLogado}
+                user={user}
+                setAbaAtiva={setAbaAtiva}
+                setAuthMode={setAuthMode}
+                agendamentos={agendamentos}
+                novoAgendamento={novoAgendamento}
+                handleAgendamentoChange={handleAgendamentoChange}
+                handleAgendamentoSubmit={handleAgendamentoSubmit}
+                agendamentoError={agendamentoError}
+                agendamentoFeedback={agendamentoFeedback}
+                loadingAgendamentos={loadingAgendamentos}
+              />
+            )}
+          </>
         ) : (
           <>
             {abaAtiva === "home" && <Home />}
