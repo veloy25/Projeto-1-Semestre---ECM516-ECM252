@@ -14,7 +14,7 @@ function Header({
     <header className="header-area">
       <h1 className="logo">AUventura Park</h1>
       <p className="subtitle">
-        {isLogado ? "Area do Cliente" : "Cuidado, carinho e diversao para o seu cão"}
+        {isLogado ? "Área do Cliente" : "Cuidado para seu pet, tranquilidade para você!"}
       </p>
 
       <Navbar
