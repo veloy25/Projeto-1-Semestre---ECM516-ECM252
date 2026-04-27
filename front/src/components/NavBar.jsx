@@ -9,6 +9,18 @@ function Navbar({
   setAuthError,
   setFeedbackMessage,
 }) {
+  const handleAgendamentosClick = () => {
+    if (isLogado) {
+      setAbaAtiva("agendamentos");
+      return;
+    }
+
+    setAbaAtiva("login");
+    setAuthMode("login");
+    setAuthError("");
+    setFeedbackMessage("");
+  };
+
   if (isLogado) {
     return (
       <nav className="nav-wrapper">
@@ -22,7 +34,7 @@ function Navbar({
 
           <button
             className={`nav-button ${abaAtiva === "agendamentos" ? "nav-button-active" : ""}`}
-            onClick={() => setAbaAtiva("agendamentos")}
+            onClick={handleAgendamentosClick}
           >
             Agendamentos
           </button>
@@ -58,6 +70,13 @@ function Navbar({
           Entrar/Criar
         </button>
 
+        <button 
+          className = {`nav-button ${abaAtiva === "agendamentos" ? "nav-button-active" : ""}`}
+          onClick={handleAgendamentosClick}
+        >
+          Agendamentos
+        </button>
+        
         <button
           className={`nav-button ${abaAtiva === "depoimentos" ? "nav-button-active" : ""}`}
           onClick={() => setAbaAtiva("depoimentos")}
