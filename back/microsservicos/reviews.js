@@ -7,7 +7,7 @@ const app = express();
 class reviews{
     constructor (dbPool){
         this.pool = dbPool
-        this.initializeDatabase()
+        this.initializeTable()
     }
 
     async initializeTable(){
