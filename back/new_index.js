@@ -1,5 +1,5 @@
 import bdConnection from "./repo/bdConnection.js";
-import User from "./microsservico/user.js";
+import User from "./microsservicos/user.js";
 import Reviews from "./microsservicos/reviews.js"
 import express, { json } from "express";
 import cors from "cors"
@@ -18,15 +18,14 @@ async function startApp() {
         console.log("--- Sistema Iniciando ---");
 
         //criação do bd e tabela usuarios
-        const dbUser = new bdConnection("Usuarios");
-        const poolUser = await dbUser.init();
-        const userModel = new User(poolUser);
+        const db = new bdConnection();
+        const pool = await db.init();
+
+        const userModel = new User(pool);
         await userModel.initializeTable();
 
-        //criação do bd e tabela usuarios
-        const dbReviews = new bdConnection("Depoimentos");
-        const poolReviews = await dbReviews.init();
-        const reviewsModel = new Reviews(poolReviews);
+        //criação da tabela depoimentos
+        const reviewsModel = new Reviews(pool);
         await reviewsModel.initializeTable();
 
         console.log("--- Sistema Pronto para Uso ---");
@@ -107,7 +106,7 @@ function userRoutes(userModel) {
     });
 
     //rota de obtenção das informações do usuário já logado
-    app.get("/api/me", authenticate, (req, res) =>{
+    app.get("/api/me", authenticate, async (req, res) =>{
         try {
             const userId = req.user.id
             const response = await userModel.findById(userId)
