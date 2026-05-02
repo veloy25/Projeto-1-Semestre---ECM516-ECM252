@@ -6,30 +6,20 @@ const repoParameters = {
     host: process.env.DB_HOST || "127.0.0.1",
     user: process.env.DB_USER || "root",
     password: process.env.DB_PASSWORD || "",
-    database: null,
+    database: process.env.DB_DATABASE,
     dbPort: process.env.DB_PORT || 3306,
-    port: PORT = process.env.PORT || 3000,
-    jwtSecret: process.env.JWT_SECRET || "super_secret_login_key"
+    port: process.env.PORT || 3000
 }
 
 class bdConnection {
     constructor(database) {
-        this.config = {...repoParameters, database: database}
-        this.pool = null
+        this.config = repoParameters
+        this.pool = null;
     }
     
     async init() {
 
-        const rootPool = mysql.createPool({
-            host: this.config.host,
-            user: this.config.user,
-            password: this.config.password,
-            port: this.config.dbPort
-        }).promise();
-
-        console.log("Verificando se o banco de dados existe...");
-
-        await rootPool.query(`CREATE DATABASE IF NOT EXISTS \`${this.config.database}\``);
+        console.log(`Conectando ao banco de dados na nuvem '${this.config.database}'...`);
         
         this.pool = mysql.createPool({
             host: this.config.host,
@@ -37,15 +27,16 @@ class bdConnection {
             password: this.config.password,
             database: this.config.database,
             port: this.config.dbPort,
-            connectionLimit: 10
+            connectionLimit: 10,
+            ssl: { rejectUnauthorized: false }
         }).promise();
 
-        console.log(`Banco de dados '${this.config.database}' inicializado e pronto para uso!`);
+        console.log(`Conexão com '${this.config.database}' estabelecida com sucesso!`);
 
-        return this.pool
+        return this.pool;
     }
 }
 
-export default bdConnection
+export default bdConnection;
 
 
