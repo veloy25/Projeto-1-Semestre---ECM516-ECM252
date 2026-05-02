@@ -2,9 +2,11 @@ import bdConnection from "./repo/bdConnection.js";
 import User from "./microsservico/user.js";
 import Reviews from "./microsservicos/reviews.js"
 import express, { json } from "express";
-import nodemon from "nodemon";
+import cors from "cors"
 
 const app = express();
+
+app.use(cors())
 app.use(express.json());
 
 const JWT_SECRET = "super_secret_key"; 
@@ -42,7 +44,7 @@ async function startApp() {
 }
 
 function userRoutes(userModel) {
-    
+    //Middleware que verifica se o usuário possui o token
     const authenticate = (req, res, next) => {
         const authHeader = req.headers.authorization;
         if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -88,6 +90,8 @@ function userRoutes(userModel) {
             if (!response[0]) {
                 return res.status(401).json({error: response[1].error})
             }
+
+            const user = response[1]
 
             const token = jwt.sign({ id: user.id, nome: user.nome, email: user.email }, JWT_SECRET, {
                   expiresIn: JWT_EXPIRATION,
