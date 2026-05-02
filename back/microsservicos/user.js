@@ -18,7 +18,7 @@ class user{
             password VARCHAR(255) NOT NULL,
             criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
           )`);
-          console.log("Database table 'users' is ready.");
+          console.log("Database table 'usuarios' is ready.");
     }
 
     async createUser(nome, email, senha) {
@@ -28,7 +28,7 @@ class user{
             return [false, {error: "É necesário preencher todos os campos."}]
         }
 
-        const [existingUsers] = await this.pool.query("SELECT id FROM users WHERE email = ?", [normalizedEmail]);
+        const [existingUsers] = await this.pool.query("SELECT id FROM usuarios WHERE email = ?", [normalizedEmail]);
         
         if (existingUsers.length > 0) {
             return [false, {error: "Este e-mail já está em uso."}]
@@ -59,24 +59,24 @@ class user{
         }
 
         const [rows] = await this.pool.query(
-            "SELECT id, nome, email, password FROM users WHERE email = ? AND password = ?", 
+            "SELECT id, nome, email, password FROM usuarios WHERE email = ? AND password = ?", 
             [normalizedEmail, senha]
         );
 
-        return rows.length > 0 ? rows[0] : null;
+        return rows.length > 0 ? rows[0] : [false, {error: "Credenciais inválidas"}];
     }
 
     async findById(id) {
 
         const [rows] = await this.pool.query(
-            "SELECT nome, email, password FROM users WHERE id = ?", 
+            "SELECT nome, email, password FROM usuarios WHERE id = ?", 
             [id]
         );
 
         if (rows.length === 0){
             return [null, {error: "Usuário não encontrado."}]
         }
-        return rows.length > 0 ? rows[0] : null;
+        return [true, rows[0]];
     }
 
         
