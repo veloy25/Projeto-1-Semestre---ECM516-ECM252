@@ -49,13 +49,13 @@ class user{
 
     async findByEmail(email, senha) { 
         if (!email || !senha || typeof email !== 'string') {
-            return [null, {error: "os dados não são válidos"}]; 
+            return [false, {error: "os dados não são válidos"}]; 
         }
 
         const normalizedEmail = email.trim().toLowerCase();
 
         if (!normalizedEmail.includes("@")) {
-            return [null, {error: "O email deve incluir @"}];
+            return [false, {error: "O email deve incluir @"}];
         }
 
         const [rows] = await this.pool.query(
@@ -63,7 +63,7 @@ class user{
             [normalizedEmail, senha]
         );
 
-        return rows.length > 0 ? rows[0] : [false, {error: "Credenciais inválidas"}];
+        return rows.length > 0 ? [true, rows[0]] : [false, {error: "Credenciais inválidas"}];
     }
 
     async findById(id) {
