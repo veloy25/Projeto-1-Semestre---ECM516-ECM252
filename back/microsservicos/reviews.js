@@ -13,17 +13,17 @@ class reviews{
     async initializeTable(){
         await this.pool.query(`CREATE TABLE IF NOT EXISTS depoimentos (
             id INT AUTO_INCREMENT PRIMARY KEY,
-            nome VARCHAR(100) NOT NULL,
-            email VARCHAR(180) NOT NULL UNIQUE,
-            password VARCHAR(255) NOT NULL,
+            nomeCachorro VARCHAR(100) NOT NULL,
+            nomeTutor VARCHAR(100) NOT NULL,
+            raca VARCHAR(100) NOT NULL,
+            comentario TEXT NOT NULL,
             criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
           )`);
-        console.log("Database table 'users' is ready.");
+        console.log("Database table 'depoimentos' is ready.")
     }
 
     async getReview(){
         const [rows] = await this.pool.query("SELECT * FROM depoimentos ORDER by criado_em")
-
         return rows
     }
 
@@ -45,3 +45,5 @@ class reviews{
     }
 
 }
+
+export default reviews;
