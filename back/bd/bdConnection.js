@@ -14,33 +14,24 @@ const repoParameters = {
 
 class bdConnection {
     constructor(database) {
-        this.config = {...repoParameters, database: database}
+        this.config = repoParameters
         this.pool = null
     }
     
     async init() {
+    console.log(`A ligar ao banco de dados na nuvem '${this.config.database}'...`);
 
-        const rootPool = mysql.createPool({
-            host: this.config.host,
-            user: this.config.user,
-            password: this.config.password,
-            port: this.config.dbPort
-        }).promise();
-
-        console.log("Verificando se o banco de dados existe...");
-
-        await rootPool.query(`CREATE DATABASE IF NOT EXISTS \`${this.config.database}\``);
-        
-        this.pool = mysql.createPool({
+       this.pool = mysql.createPool({
             host: this.config.host,
             user: this.config.user,
             password: this.config.password,
             database: this.config.database,
             port: this.config.dbPort,
-            connectionLimit: 10
+            connectionLimit: 10,
+            ssl: { rejectUnauthorized: false } 
         }).promise();
 
-        console.log(`Banco de dados '${this.config.database}' inicializado e pronto para uso!`);
+        console.log(`Ligação com '${this.config.database}' estabelecida com sucesso!`);
 
         return this.pool
     }
