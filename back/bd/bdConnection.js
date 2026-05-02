@@ -6,7 +6,7 @@ const repoParameters = {
     host: process.env.DB_HOST || "127.0.0.1",
     user: process.env.DB_USER || "root",
     password: process.env.DB_PASSWORD || "",
-    database: null,
+    database: process.env.DB_DATABASE,
     dbPort: process.env.DB_PORT || 3306,
     port: process.env.PORT || 3000,
     jwtSecret: process.env.JWT_SECRET || "super_secret_login_key"
