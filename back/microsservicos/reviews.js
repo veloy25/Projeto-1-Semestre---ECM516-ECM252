@@ -10,6 +10,7 @@ class reviews{
         this.initializeTable()
     }
 
+    // Documentação: Cria a tabela de depoimentos
     async initializeTable(){
         await this.pool.query(`CREATE TABLE IF NOT EXISTS depoimentos (
             id INT AUTO_INCREMENT PRIMARY KEY,
@@ -22,13 +23,15 @@ class reviews{
         console.log("Database table 'depoimentos' is ready.")
     }
 
+    // Documentação: Puxa todos os depoimentos na ordem correta
     async getReview(){
         const [rows] = await this.pool.query("SELECT * FROM depoimentos ORDER by criado_em")
         return rows
     }
 
+    // Documentação: Insere o depoimento no banco
     async createReview(nomeCachorro, nomeTutor, raca, comentario){
-        if (!nomeCachorro || !nomeTutor || !raca){
+        if (!nomeCachorro || !nomeTutor || !raca || !comentario){
             return [false, {error: "É necessário preencher todos os campos"}]
         }
 
@@ -36,6 +39,7 @@ class reviews{
         [nomeCachorro, nomeTutor, raca, comentario]);
 
         return [true, {
+            id: result.insertId,
             nomeCachorro: nomeCachorro,
             nomeTutor: nomeTutor,
             raca: raca,
