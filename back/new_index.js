@@ -1,4 +1,4 @@
-import bdConnection from "./repo/bdConnection.js";
+import bdConnection from "./bd/bdConnection.js";
 import User from "./microsservicos/user.js";
 import Reviews from "./microsservicos/reviews.js"
 import express, { json } from "express";
