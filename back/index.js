@@ -67,10 +67,16 @@ function userRoutes(userModel) {
             const response = await userModel.createUser(nome, email, senha)
 
             if (!response[0]) {
-                return res.statusCode(409).json({ error: response[1].error});
+                return res.status(409).json({ error: response[1].error});
             }
 
-            res.statusCode(201).json({ id: response.id, nome: response.nome, email: response.email })
+            const usuario = response[1]
+
+            res.status(201).json({
+                 id: usuario.id, 
+                 nome: usuario.nome, 
+                 email: usuario.email 
+            });
 
         } catch (error) {
             console.error("POST /api/signup error:", error);
