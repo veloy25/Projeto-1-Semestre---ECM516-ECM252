@@ -3,6 +3,7 @@ import User from "./microsservicos/user.js";
 import Reviews from "./microsservicos/reviews.js"
 import express, { json } from "express";
 import cors from "cors"
+import jwt from "jsonwebtoken";
 
 const app = express();
 
@@ -102,7 +103,15 @@ function userRoutes(userModel) {
                   expiresIn: JWT_EXPIRATION,
             });
 
-            res.status(201).json({ token, user: { id: user.id, nome: user.nome, email: user.email } });
+            res.status(201).json(
+                {token, 
+                    user: { 
+                        id: user.id, 
+                        nome: user.nome, 
+                        email: user.email 
+                    } 
+                }
+            );
 
 
         } catch (error) {
