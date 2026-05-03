@@ -1,6 +1,7 @@
-import bdConnection from "./bd/bdConnection.js";
+import bdConnection from "./shared/bdConnection.js";
 import User from "./microsservicos/user.js";
-import Reviews from "./microsservicos/reviews.js"
+import Reviews from "./microsservicos/reviews.js";
+import eventBus from "./shared/eventBus.js";
 import express, { json } from "express";
 import cors from "cors"
 import jwt from "jsonwebtoken";
